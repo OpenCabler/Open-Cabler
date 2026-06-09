@@ -185,9 +185,7 @@ document.getElementById("printBtn").onclick = function () {
 
   function getWeekEnding(dateStr) {
     let d = new Date(dateStr);
-    let day = d.getDay();
-    let diff = 7 - day;
-    d.setDate(d.getDate() + diff);
+    d.setDate(d.getDate() + (7 - d.getDay()));
     return d.toISOString().split("T")[0];
   }
 
@@ -223,6 +221,8 @@ document.getElementById("printBtn").onclick = function () {
   let content =
     "<html><body style='font-family:Arial;padding:20px'>" +
 
+    "<p style='color:red'><b>Tap Share → Print to save PDF</b></p>" +
+
     "<h2 style='text-align:center'>CABLING LOGBOOK</h2>" +
 
     "<p><b>Name:</b> " + document.getElementById("name").value + "</p>" +
@@ -240,20 +240,10 @@ document.getElementById("printBtn").onclick = function () {
     "<h3>Weekly Sign-Off</h3>" +
     "<p><b>Week Ending:</b> " + weekEnding + "</p>" +
     "<p><b>Total Hours This Week:</b> " + weeklyTotal + "</p>" +
-    "<p>Supervisor Name: __________</p>" +
-    "<p>Licence Number: __________</p>" +
-    "<p>Signature:</p>" +
-    "<div style='border:1px solid black;height:80px;width:250px'></div>" +
 
     "</body></html>";
 
-  // ✅ OPEN IN SAME TAB (works on iPhone)
   document.open();
   document.write(content);
   document.close();
-  };
-  </script>
-  </body>
-  </html>
-
- 
+};
