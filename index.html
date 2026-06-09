@@ -181,7 +181,6 @@ document.getElementById("printBtn").onclick = function () {
   let rows = "";
   let total = 0;
 
-  // ✅ Recalculate week inside button
   let selectedDate = document.getElementById("date").value;
 
   function getWeekEnding(dateStr) {
@@ -221,26 +220,22 @@ document.getElementById("printBtn").onclick = function () {
       "</tr>";
   });
 
-  let w = window.open("");
+  let content =
+    "<html><body style='font-family:Arial;padding:20px'>" +
 
-  w.document.write(
-    "<html><body style='font-family:Arial;padding:30px'>" +
-
-    "<h1 style='text-align:center'>CABLING LOGBOOK</h1>" +
+    "<h2 style='text-align:center'>CABLING LOGBOOK</h2>" +
 
     "<p><b>Name:</b> " + document.getElementById("name").value + "</p>" +
     "<p><b>Employer:</b> " + document.getElementById("employer").value + "</p>" +
 
     "<h3>Total Hours: " + total + " / 360</h3>" +
 
-    "<h3>Work Log</h3>" +
-
     "<table border='1' style='width:100%;border-collapse:collapse'>" +
     "<tr><th>Date</th><th>Job</th><th>Work</th><th>Cable</th><th>Task</th><th>Hours</th></tr>" +
     rows +
     "</table>" +
 
-    "<br><br><hr><br>" +
+    "<br><hr><br>" +
 
     "<h3>Weekly Sign-Off</h3>" +
     "<p><b>Week Ending:</b> " + weekEnding + "</p>" +
@@ -250,18 +245,13 @@ document.getElementById("printBtn").onclick = function () {
     "<p>Signature:</p>" +
     "<div style='border:1px solid black;height:80px;width:250px'></div>" +
 
-    "<br><br><hr><br>" +
+    "</body></html>";
 
-    "<h3>Final Declaration</h3>" +
-    "<p>Supervisor Name: __________</p>" +
-    "<p>Licence Number: __________</p>" +
-    "<p>Signature:</p>" +
-    "<div style='border:1px solid black;height:80px;width:250px'></div>" +
-    "<p>Date: __________</p>" +
-
-    "</body></html>"
-  );
-
+  // ✅ OPEN IN SAME TAB (works on iPhone)
+  document.open();
+  document.write(content);
+  document.close();
+};
   w.document.close();
 
   setTimeout(function() {
