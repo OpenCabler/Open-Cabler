@@ -153,9 +153,36 @@ document.getElementById("printBtn").onclick = function () {
   let rows = "";
   let total = 0;
 
+  let selectedDate = document.getElementById("date").value;
+
+  // ✅ Calculate week ending (Sunday)
+  function getWeekEnding(dateStr) {
+    let d = new Date(dateStr);
+    let day = d.getDay();
+    let diff = 7 - day;
+    d.setDate(d.getDate() + diff);
+    return d.toISOString().split("T")[0];
+  }
+
+  let weekEnding = getWeekEnding(selectedDate);
+
+  // ✅ Calculate weekly total
+  let weekStart = new Date(selectedDate);
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+  let weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+
+  let weeklyTotal = 0;
+
   entries.forEach(function(e) {
 
     total += e.hours;
+
+    let entryDate = new Date(e.date);
+    if (entryDate >= weekStart && entryDate <= weekEnd) {
+      weeklyTotal += e.hours;
+    }
 
     rows += "<tr>" +
       "<td>" + e.date + "</td>" +
@@ -164,59 +191,40 @@ document.getElementById("printBtn").onclick = function () {
       "<td>" + e.cable + "</td>" +
       "<td>" + e.task + "</td>" +
       "<td>" + e.hours + "</td>" +
-      "<td></td>" +
       "</tr>";
   });
 
-  let w = window.open("");
+  let content =
+    "<html><body style='font-family:Arial;padding:20px'>" +
 
-  w.document.write(
-    "<html><body style='font-family:Arial;padding:30px'>" +
-
-    "<h1 style='text-align:center'>CABLING LOGBOOK</h1>" +
+    "<h2 style='text-align:center'>CABLING LOGBOOK</h2>" +
 
     "<p><b>Name:</b> " + document.getElementById("name").value + "</p>" +
     "<p><b>Employer:</b> " + document.getElementById("employer").value + "</p>" +
 
     "<h3>Total Hours: " + total + " / 360</h3>" +
 
-    "<h3>Work Log</h3>" +
-
     "<table border='1' style='width:100%;border-collapse:collapse'>" +
-    "<tr><th>Date</th><th>Job</th><th>Work</th><th>Cable</th><th>Task</th><th>Hours</tr>" +
+    "<tr><th>Date</th><th>Job</th><th>Work</th><th>Cable</th><th>Task</th><th>Hours</th></tr>" +
     rows +
     "</table>" +
 
-    "<br><br><hr><br>" +
+    "<br><hr><br>" +
 
     "<h3>Weekly Sign-Off</h3>" +
-    "<p>Week Ending: __________</p>" +
-    "<p>Total Hours This Week: __________</p>" +
+    "<p><b>Week Ending:</b> " + weekEnding + "</p>" +
+    "<p><b>Total Hours This Week:</b> " + weeklyTotal + "</p>" +
     "<p>Supervisor Name: __________</p>" +
     "<p>Licence Number: __________</p>" +
     "<p>Signature:</p>" +
     "<div style='border:1px solid black;height:80px;width:250px'></div>" +
 
-    "<br><br><hr><br>" +
+    "<br><p><i>Tap Share → Print to save PDF</i></p>" +
 
-    "<h3>Final Declaration</h3>" +
-    "<p>Supervisor Name: __________</p>" +
-    "<p>Licence Number: __________</p>" +
-    "<p>Signature:</p>" +
-    "<div style='border:1px solid black;height:80px;width:250px'></div>" +
-    "<p>Date: __________</p>" +
+    "</body></html>";
 
-    "</body></html>"
-  );
-
-  w.document.close();
-
-  setTimeout(function() {
-    w.print();
-  }, 500);
+  // ✅ iPhone-safe method
+  document.open();
+  document.write(content);
+  document.close();
 };
-
-</script>
-
-</body>
-</html>
