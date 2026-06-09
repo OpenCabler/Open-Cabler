@@ -146,7 +146,35 @@ function deleteEntry(index) {
   saveData(); // ✅ keep autosave updated
   render();   // ✅ refresh screen
 }
+// ✅ Calculate week ending (Sunday)
+function getWeekEnding(dateStr) {
+  let d = new Date(dateStr);
+  let day = d.getDay(); // 0 = Sunday
+  let diff = 7 - day;   // days until Sunday
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().split("T")[0];
+}
 
+// ✅ Get current selected date
+let selectedDate = document.getElementById("date").value;
+let weekEnding = getWeekEnding(selectedDate);
+
+// ✅ Calculate weekly total
+let weekStart = new Date(selectedDate);
+weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Sunday start
+
+let weekEnd = new Date(weekStart);
+weekEnd.setDate(weekEnd.getDate() + 6); // Saturday end
+
+let weeklyTotal = 0;
+
+entries.forEach(function(e) {
+  let entryDate = new Date(e.date);
+  if (entryDate >= weekStart && entryDate <= weekEnd) {
+    weeklyTotal += e.hours;
+  }
+});
+``
 // ✅ PRINT
 document.getElementById("printBtn").onclick = function () {
 
@@ -189,8 +217,8 @@ document.getElementById("printBtn").onclick = function () {
     "<br><br><hr><br>" +
 
     "<h3>Weekly Sign-Off</h3>" +
-    "<p>Week Ending: __________</p>" +
-    "<p>Total Hours This Week: __________</p>" +
+    "<p><b>Week Ending:</b> " + weekEnding + "</p>" +
+    "<p><b>Total Hours This Week:</b> " + weeklyTotal + "</p>" +
     "<p>Supervisor Name: __________</p>" +
     "<p>Licence Number: __________</p>" +
     "<p>Signature:</p>" +
