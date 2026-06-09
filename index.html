@@ -33,7 +33,7 @@ input, select, button {
 
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
-
+``
 <body>
 
 <h2>Cabling Logbook</h2>
@@ -146,34 +146,6 @@ function deleteEntry(index) {
   saveData(); // ✅ keep autosave updated
   render();   // ✅ refresh screen
 }
-// ✅ Calculate week ending (Sunday)
-function getWeekEnding(dateStr) {
-  let d = new Date(dateStr);
-  let day = d.getDay(); // 0 = Sunday
-  let diff = 7 - day;   // days until Sunday
-  d.setDate(d.getDate() + diff);
-  return d.toISOString().split("T")[0];
-}
-
-// ✅ Get current selected date
-let selectedDate = document.getElementById("date").value;
-let weekEnding = getWeekEnding(selectedDate);
-
-// ✅ Calculate weekly total
-let weekStart = new Date(selectedDate);
-weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Sunday start
-
-let weekEnd = new Date(weekStart);
-weekEnd.setDate(weekEnd.getDate() + 6); // Saturday end
-
-let weeklyTotal = 0;
-
-entries.forEach(function(e) {
-  let entryDate = new Date(e.date);
-  if (entryDate >= weekStart && entryDate <= weekEnd) {
-    weeklyTotal += e.hours;
-  }
-});
 
 // ✅ PRINT
 document.getElementById("printBtn").onclick = function () {
@@ -181,32 +153,9 @@ document.getElementById("printBtn").onclick = function () {
   let rows = "";
   let total = 0;
 
-  let selectedDate = document.getElementById("date").value;
-
-  function getWeekEnding(dateStr) {
-    let d = new Date(dateStr);
-    d.setDate(d.getDate() + (7 - d.getDay()));
-    return d.toISOString().split("T")[0];
-  }
-
-  let weekEnding = getWeekEnding(selectedDate);
-
-  let weekStart = new Date(selectedDate);
-  weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-
-  let weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekEnd.getDate() + 6);
-
-  let weeklyTotal = 0;
-
   entries.forEach(function(e) {
 
     total += e.hours;
-
-    let entryDate = new Date(e.date);
-    if (entryDate >= weekStart && entryDate <= weekEnd) {
-      weeklyTotal += e.hours;
-    }
 
     rows += "<tr>" +
       "<td>" + e.date + "</td>" +
@@ -215,35 +164,59 @@ document.getElementById("printBtn").onclick = function () {
       "<td>" + e.cable + "</td>" +
       "<td>" + e.task + "</td>" +
       "<td>" + e.hours + "</td>" +
+      "<td></td>" +
       "</tr>";
   });
 
-  let content =
-    "<html><body style='font-family:Arial;padding:20px'>" +
+  let w = window.open("");
 
-    "<p style='color:red'><b>Tap Share → Print to save PDF</b></p>" +
+  w.document.write(
+    "<html><body style='font-family:Arial;padding:30px'>" +
 
-    "<h2 style='text-align:center'>CABLING LOGBOOK</h2>" +
+    "<h1 style='text-align:center'>CABLING LOGBOOK</h1>" +
 
     "<p><b>Name:</b> " + document.getElementById("name").value + "</p>" +
     "<p><b>Employer:</b> " + document.getElementById("employer").value + "</p>" +
 
     "<h3>Total Hours: " + total + " / 360</h3>" +
 
+    "<h3>Work Log</h3>" +
+
     "<table border='1' style='width:100%;border-collapse:collapse'>" +
-    "<tr><th>Date</th><th>Job</th><th>Work</th><th>Cable</th><th>Task</th><th>Hours</th></tr>" +
+    "<tr><th>Date</th><th>Job</th><th>Work</th><th>Cable</th><th>Task</th><th>Hours</tr>" +
     rows +
     "</table>" +
 
-    "<br><hr><br>" +
+    "<br><br><hr><br>" +
 
     "<h3>Weekly Sign-Off</h3>" +
-    "<p><b>Week Ending:</b> " + weekEnding + "</p>" +
-    "<p><b>Total Hours This Week:</b> " + weeklyTotal + "</p>" +
+    "<p>Week Ending: __________</p>" +
+    "<p>Total Hours This Week: __________</p>" +
+    "<p>Supervisor Name: __________</p>" +
+    "<p>Licence Number: __________</p>" +
+    "<p>Signature:</p>" +
+    "<div style='border:1px solid black;height:80px;width:250px'></div>" +
 
-    "</body></html>";
+    "<br><br><hr><br>" +
 
-  document.open();
-  document.write(content);
-  document.close();
+    "<h3>Final Declaration</h3>" +
+    "<p>Supervisor Name: __________</p>" +
+    "<p>Licence Number: __________</p>" +
+    "<p>Signature:</p>" +
+    "<div style='border:1px solid black;height:80px;width:250px'></div>" +
+    "<p>Date: __________</p>" +
+
+    "</body></html>"
+  );
+
+  w.document.close();
+
+  setTimeout(function() {
+    w.print();
+  }, 500);
 };
+
+</script>
+
+</body>
+</html>
