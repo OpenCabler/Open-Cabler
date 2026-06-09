@@ -93,22 +93,27 @@ function saveData() {
 // ✅ ADD ENTRY
 document.getElementById("addBtn").onclick = function () {
 
-  let date = document.getElementById("date").value;
-  let job = document.getElementById("job").value;
-  let work = document.getElementById("work").value;
-  let cable = document.getElementById("cable").value;
-  let task = document.getElementById("task").value;
-  let hours = parseFloat(document.getElementById("hours").value);
+  try {
+    let date = document.getElementById("date").value;
+    let job = document.getElementById("job").value;
+    let work = document.getElementById("work").value;
+    let cable = document.getElementById("cable").value;
+    let task = document.getElementById("task").value;
+    let hours = parseFloat(document.getElementById("hours").value);
 
-  if (!hours || hours <= 0) {
-    alert("Enter valid hours");
-    return;
+    if (!hours || hours <= 0) {
+      alert("Enter valid hours");
+      return;
+    }
+
+    entries.push({ date, job, work, cable, task, hours });
+
+    saveData();
+    render();
+
+  } catch (err) {
+    alert("Error in Add Entry: " + err.message);
   }
-
-  entries.push({ date, job, work, cable, task, hours });
-
-  saveData();   // ✅ autosave
-  render();
 };
 
 // ✅ DISPLAY
