@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cabling Logbook</title>
+
+<style>
+body {
+  font-family: Arial;
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+input, select, button {
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.entry {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Cabling Logbook</h2>
+
+<!-- Details -->
+<input id="name" placeholder="Your Name">
+<input id="employer" placeholder="Employer">
+
+<hr>
+
+<!-- ✅ Auto date -->
+<input id="date" type="date">
+<input id="job" placeholder="Job">
+<input id="work" placeholder="Work">
+<input id="hours" type="number" placeholder="Hours">
+
+<select id="cable">
+  <option>Cat5e</option>
+  <option>Cat6</option>
+  <option>Cat6A</option>
+</select>
+
+<select id="task">
+  <option>Cable Installation</option>
+  <option>Terminate Outlets Field</option>
+  <option>Terminate Outlets Rack</option>
+  <option>Patching</option>
+  <option>Testing/Certifying</option>
+</select>
+
+<button id="addBtn" type="button">Add Entry</button>
+
+<h3>Total: <span id="total">0</span></h3>
+
+<button id="printBtn" type="button">📄 Print Logbook</button>
+
+<div id="list"></div>
+
+<script>
+
+// ✅ LOAD SAVED DATA
+let entries = JSON.parse(localStorage.getItem("logbook")) || [];
+
+// ✅ AUTO DATE
+window.onload = function () {
+  let today = new Date().toISOString().split("T")[0];
+  document.getElementById("date").value = today;
+
+  render(); // ✅ load saved entries on start
+};
+
+// ✅ SAVE FUNCTION
+function saveData() {
+  localStorage.setItem("logbook", JSON.stringify(entries));
+}
+
+// ✅ ADD ENTRY
+document.getElementById("addBtn").onclick = function () {
+
+  let date = document.getElementById("date").value;
+  let job = document.getElementById("job").value;
+  let work = document.getElementById("work").value;
+  let cable = document.getElementById("cable").value;
+  let task = document.getElementById("task").value;
+  let hours = parseFloat(document.getElementById("hours").value);
+
+  if (!hours || hours <= 0) {
+    alert("Enter valid hours");
+    return;
+  }
+
+  entries.push({ date, job, work, cable, task, hours });
+
+  saveData();   // ✅ autosave
+  render();
+};
+
+// ✅ DISPLAY
+function render() {
+
+  let list = document.getElementById("list");
+  list.innerHTML = "";
+
+  let total = 0;
+
+  entries.forEach(function(e, index) {
+
+    total += e.hours;
+
+    let div = document.createElement("div");
+    div.className = "entry";
+
+    div.innerHTML =
+      "<b>" + e.date + "</b> - " + e.job +
+      "<br>" + e.work +
+      "<br>" + e.cable + " | " + e.task +
+      " | " + e.hours + " hrs" +
+      "<br><button onclick='deleteEntry(" + index + ")'>❌ Delete</button>";
+
+    list.appendChild(div);
+  });
+
+  document.getElementById("total").innerText = total;
+}
+function deleteEntry(index) {
+
+  // remove 1 item at position index
+  entries.splice(index, 1);
+
+  saveData(); // ✅ keep autosave updated
+  render();   // ✅ refresh screen
+}
+
+// ✅ PRINT
+document.getElementById("printBtn").onclick = function () {
+
+  let rows = "";
+  let total = 0;
+
+  entries.forEach(function(e) {
+
+    total += e.hours;
+
+    rows += "<tr>" +
+      "<td>" + e.date + "</td>" +
+      "<td>" + e.job + "</td>" +
+      "<td>" + e.work + "</td>" +
+      "<td>" + e.cable + "</td>" +
+      "<td>" + e.task + "</td>" +
+      "<td>" + e.hours + "</td>" +
+      "<td></td>" +
+      "</tr>";
+  });
+
+  let w = window.open("");
+
+  w.document.write(
+    "<html><body style='font-family:Arial;padding:30px'>" +
+
+    "<h1 style='text-align:center'>CABLING LOGBOOK</h1>" +
+
+    "<p><b>Name:</b> " + document.getElementById("name").value + "</p>" +
+    "<p><b>Employer:</b> " + document.getElementById("employer").value + "</p>" +
+
+    "<h3>Total Hours: " + total + " / 360</h3>" +
+
+    "<h3>Work Log</h3>" +
+
+    "<table border='1' style='width:100%;border-collapse:collapse'>" +
+    "<tr><th>Date</th><th>Job</th><th>Work</th><th>Cable</th><th>Task</th><th>Hours</tr>" +
+    rows +
+    "</table>" +
+
+    "<br><br><hr><br>" +
+
+    "<h3>Weekly Sign-Off</h3>" +
+    "<p>Week Ending: __________</p>" +
+    "<p>Total Hours This Week: __________</p>" +
+    "<p>Supervisor Name: __________</p>" +
+    "<p>Licence Number: __________</p>" +
+    "<p>Signature:</p>" +
+    "<div style='border:1px solid black;height:80px;width:250px'></div>" +
+
+    "<br><br><hr><br>" +
+
+    "<h3>Final Declaration</h3>" +
+    "<p>Supervisor Name: __________</p>" +
+    "<p>Licence Number: __________</p>" +
+    "<p>Signature:</p>" +
+    "<div style='border:1px solid black;height:80px;width:250px'></div>" +
+    "<p>Date: __________</p>" +
+
+    "</body></html>"
+  );
+
+  w.document.close();
+
+  setTimeout(function() {
+    w.print();
+  }, 500);
+};
+
+</script>
+
+</body>
+</html>
